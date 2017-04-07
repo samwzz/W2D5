@@ -50,10 +50,8 @@ class LinkedList
   end
 
   def include?(key)
-    finder = first
-    until finder == @sentinel
-      return true if finder.key == key
-      finder = finder.next
+    each do |link|
+      return true if link.key == key
     end
     false
   end
