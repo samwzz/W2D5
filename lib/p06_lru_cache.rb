@@ -1,5 +1,6 @@
 require_relative 'p05_hash_map'
 require_relative 'p04_linked_list'
+require 'byebug'
 
 class LRUCache
   attr_reader :count
@@ -15,14 +16,18 @@ class LRUCache
   end
 
   def get(key)
-    value = calc!(key)
+    value = nil
     if @map.include?(key)
-      @store.remove(key)
-    elsif count == @max
+      update_link!(@map.get(key))
+      value = @map.get(key)
+    else
+      value = calc!(key)
+      @store.append(key, value)
+      @map.set(key, @store.last)
+    end
+    if count > @max
       eject!
     end
-    @store.append(key, value)
-    @map.set(key, @store.last)
     value
   end
 
@@ -37,10 +42,12 @@ class LRUCache
   end
 
   def update_link!(link)
-    # suggested helper method; move a link to the end of the list
+    @store.remove(link.key)
+    @store.append(link.key, link.val)
   end
 
   def eject!
+    @map.delete(@store.first.key)
     @store.remove(@store.first.key)
   end
 end
